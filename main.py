@@ -5,35 +5,51 @@ URL = 'https://leetcode.com/graphql'
 FIELD_NAMES = ('id', 'title', 'acceptance', 'difficulty')
 DEFAULT_FILENAME = 'leetcode_problems.csv'
 
-data = {
+payload = {
     "variables": {
         "categorySlug": "algorithms",
         "skip": 0,
         "limit": 10,
         "filters": {},
     },
-    "query": "query problemsetQuestionList($categorySlug: String, $limit: Int, $skip: Int, $filters: QuestionListFilterInput) {problemsetQuestionList: questionList(categorySlug: $categorySlug limit: $limit skip: $skip filters: $filters) {total: totalNum questions: data {acRate difficulty freqBar frontendQuestionId: questionFrontendId isFavor paidOnly: isPaidOnly status title titleSlug topicTags {name id slug} hasSolution hasVideoSolution}}}",
+    "query": """query problemsetQuestionList(
+        $categorySlug: String,
+        $limit: Int,
+        $skip: Int,
+        $filters: QuestionListFilterInput
+        ) {
+        problemsetQuestionList: questionList(
+            categorySlug: $categorySlug
+            limit: $limit
+            skip: $skip
+            filters: $filters
+            ) {
+            questions: data {
+                acRate
+                difficulty
+                frontendQuestionId: questionFrontendId 
+                title
+            }
+        }
+    }""",
 }
 
-response = requests.post(URL, json=data).json()
+response = requests.post(URL, json=payload).json()
 
-problems_list = response.get('data').get('problemsetQuestionList').get('questions')
+questions = response.get('data').get('problemsetQuestionList').get('questions')
 
 result = []
-for problem in problems_list:
-    id = problem.get('frontendQuestionId')
-    title = problem.get('title')
-    acceptance = round(problem.get('acRate'), 1)
-    difficulty = problem.get('difficulty').lower()
+for question in questions:
+    id = question.get('frontendQuestionId')
+    title = question.get('title')
+    acceptance = round(question.get('acRate'), 1)
+    difficulty = question.get('difficulty').lower()
     result.append((id, title, acceptance, difficulty))
 
 with open(DEFAULT_FILENAME, 'w') as file:
     writer = csv.writer(file)
     writer.writerow(FIELD_NAMES)
     writer.writerows(result)
-
-
-
 
 if __name__ == '__main__':
     pass
