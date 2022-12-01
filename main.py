@@ -11,8 +11,8 @@ FIELD_NAMES = ('id', 'title', 'acceptance', 'difficulty')
 DEFAULT_FILENAME = 'leetcode_problems.csv'
 
 SKIP_PROBLEMS = 0
-LIMIT_PROBLEMS = 3
-FILTERS = {}
+LIMIT_PROBLEMS = 2500
+FILTERS = dict()
 
 GRAPHQL_QUERY = {
     'variables': {
@@ -55,62 +55,98 @@ logger.addHandler(handler)
 
 
 def get_api_answer() -> dict:
+    """Sends a POST request to the endpoint.
+
+    Returns:
+        The return dict of data.
+
+    Raises:
+        EndpointError: If endpoint not available.
+
+    """
     try:
         response = requests.post(ENDPOINT, json=GRAPHQL_QUERY)
         if response.status_code != requests.codes.ok:
             message = (
-                f'Эндпоинт {ENDPOINT} недоступен.\n'
-                f'Код ответа: {response.status_code}'
+                f'Endpoint {ENDPOINT} not available.\n'
+                f'Status code: {response.status_code}'
             )
             raise EndpointError(message)
         return response.json()
     except Exception as error:
         message = (
-            f'Произошёл сбой при запросе к эндпоинту: {ENDPOINT}\n'
-            f'Ошибка: {error}'
+            f'Error occurred while trying to request the endpoint: {ENDPOINT}'
+            f'\nError: {error}'
         )
         raise RequestError(message)
 
 
 def get_problems(response: dict) -> list[dict]:
+    """Get a leetcode problems list of data.
+
+    Args:
+        response: Data received from the request.
+
+    Returns:
+        The return a list of leetcode problems.
+
+    Raises:
+        KeyError: An error occurred get value of key "data" or
+        "problemsetQuestionList" or "questions".
+        TypeError: The value of "questions" not a list.
+
+    """
     try:
         problems = response['data']['problemsetQuestionList']['questions']
     except KeyError as error:
-        message = f'В запросе отсутствует ключ: {error}.'
+        message = f'The response is missing key: {error}.'
         raise KeyError(message)
     if not isinstance(problems, list):
-        raise TypeError('questions не является списком.')
+        raise TypeError('The value of "questions" not a list.')
     return problems
 
 
 def parse_problem(problem: dict) -> tuple[str, str, float, str]:
+    """Parse id, title, acceptance and difficulty of leetcode problem.
+
+    Args:
+        problem: A dict where key-value is data of leetcode problem.
+
+    Returns:
+        The return a tuple of values id, title, acceptance and difficulty.
+
+    Raises:
+        KeyError: An error occurred get value of key "frontendQuestionId",
+        "title", "acRate" or "difficulty".
+
+    """
     try:
         problem_id = problem['frontendQuestionId']
         title = problem['title']
         acceptance = round(problem['acRate'], 1)
         difficulty = problem['difficulty'].lower()
     except KeyError as error:
-        message = f'В задаче отсутствует ключ: {error}.'
+        message = f'The problem is missing a key: {error}.'
         raise KeyError(message)
     return problem_id, title, acceptance, difficulty
 
 
 def main():
-    logger.info('Скрипт запущен.')
+    """The main logic of the script."""
+    logger.info('The script is running.')
     try:
         response = get_api_answer()
         problems = get_problems(response)
         with open(DEFAULT_FILENAME, 'w', encoding="utf-8") as file:
-            logger.info('Началась запись данных.')
+            logger.info('Data recording has begun.')
             writer = csv.writer(file)
             writer.writerow(FIELD_NAMES)
             for problem in problems:
                 writer.writerow(parse_problem(problem))
-            writer.writerow(parse_problem(problem))
-            logger.info('Данные успешно записаны.')
-        logger.info('Скрипт завершил работу.')
+            logger.info('The data was successfully written.')
+        logger.info('The script has completed.')
     except Exception as error:
-        message = f'Сбой в работе программы: {error}.\nПрограмма остановлена.'
+        message = f'Program crash: {error}.\nThe program has stopped.'
         logger.error(message)
         sys.exit()
 

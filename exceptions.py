@@ -1,10 +1,8 @@
 class EndpointError(Exception):
-    """Возникает, когда код ответа HTTP отличный от 200."""
-
+    """Raises when the HTTP response code is anything other than 200."""
     pass
 
 
 class RequestError(Exception):
-    """Возникает, когда не удалось выполнить запрос к API."""
-
+    """Raised when an API request failed"""
     pass
