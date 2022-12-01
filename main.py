@@ -10,13 +10,14 @@ ENDPOINT = 'https://leetcode.com/graphql'
 FIELD_NAMES = ('id', 'title', 'acceptance', 'difficulty')
 DEFAULT_FILENAME = 'leetcode_problems.csv'
 
+CATEGORY = 'algorithms'
 SKIP_PROBLEMS = 0
 LIMIT_PROBLEMS = 2500
 FILTERS = dict()
 
 GRAPHQL_QUERY = {
     'variables': {
-        'categorySlug': 'algorithms',
+        'categorySlug': CATEGORY,
         'skip': SKIP_PROBLEMS,
         'limit': LIMIT_PROBLEMS,
         'filters': FILTERS,
