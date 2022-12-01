@@ -11,10 +11,10 @@ FIELD_NAMES = ('id', 'title', 'acceptance', 'difficulty')
 DEFAULT_FILENAME = 'leetcode_problems.csv'
 
 SKIP_PROBLEMS = 0
-LIMIT_PROBLEMS = 2500
+LIMIT_PROBLEMS = 3
 FILTERS = {}
 
-PAYLOAD = {
+GRAPHQL_QUERY = {
     'variables': {
         'categorySlug': 'algorithms',
         'skip': SKIP_PROBLEMS,
@@ -56,17 +56,17 @@ logger.addHandler(handler)
 
 def get_api_answer() -> dict:
     try:
-        response = requests.post(ENDPOINT, json=PAYLOAD)
+        response = requests.post(ENDPOINT, json=GRAPHQL_QUERY)
         if response.status_code != requests.codes.ok:
             message = (
                 f'Эндпоинт {ENDPOINT} недоступен.\n'
-                f'Код ответа: {response.status_code}.'
+                f'Код ответа: {response.status_code}'
             )
             raise EndpointError(message)
         return response.json()
     except Exception as error:
         message = (
-            f'Произошёл сбой при запросе к эндпоинту {ENDPOINT}\n'
+            f'Произошёл сбой при запросе к эндпоинту: {ENDPOINT}\n'
             f'Ошибка: {error}'
         )
         raise RequestError(message)
@@ -76,7 +76,7 @@ def get_problems(response: dict) -> list[dict]:
     try:
         problems = response['data']['problemsetQuestionList']['questions']
     except KeyError as error:
-        message = f'В response отсутствует ключ: {error}.'
+        message = f'В запросе отсутствует ключ: {error}.'
         raise KeyError(message)
     if not isinstance(problems, list):
         raise TypeError('questions не является списком.')
@@ -90,7 +90,7 @@ def parse_problem(problem: dict) -> tuple[str, str, float, str]:
         acceptance = round(problem['acRate'], 1)
         difficulty = problem['difficulty'].lower()
     except KeyError as error:
-        message = f'В problem отсутствует ключ: {error}.'
+        message = f'В задаче отсутствует ключ: {error}.'
         raise KeyError(message)
     return problem_id, title, acceptance, difficulty
 
@@ -106,10 +106,11 @@ def main():
             writer.writerow(FIELD_NAMES)
             for problem in problems:
                 writer.writerow(parse_problem(problem))
+            writer.writerow(parse_problem(problem))
             logger.info('Данные успешно записаны.')
         logger.info('Скрипт завершил работу.')
     except Exception as error:
-        message = f'Сбой в работе программы: {error}.\n Программа остановлена.'
+        message = f'Сбой в работе программы: {error}.\nПрограмма остановлена.'
         logger.error(message)
         sys.exit()
 
