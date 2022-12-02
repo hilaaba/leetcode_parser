@@ -3,6 +3,8 @@ from main import get_problems, parse_problem
 
 
 class TestGetProblems(unittest.TestCase):
+    """Testing get_problems() function."""
+
     def test_valid_data(self):
         excepted_list = [
             {
@@ -51,6 +53,8 @@ class TestGetProblems(unittest.TestCase):
 
 
 class TestParseProblem(unittest.TestCase):
+    """Testing parse_problem() function."""
+
     def setUp(self):
         self.problem_data = {
             'acRate': 33.80323087015701,
