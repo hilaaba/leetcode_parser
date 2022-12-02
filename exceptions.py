@@ -1,8 +1,8 @@
-class EndpointError(Exception):
-    """Raises when the HTTP response code is anything other than 200."""
+class RequestError(Exception):
+    """Raised when an API request failed"""
     pass
 
 
-class RequestError(Exception):
-    """Raised when an API request failed"""
+class EndpointError(RequestError):
+    """Raises when the HTTP response code is anything other than 200."""
     pass

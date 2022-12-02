@@ -8,12 +8,13 @@ from exceptions import EndpointError, RequestError
 
 ENDPOINT = 'https://leetcode.com/graphql'
 FIELD_NAMES = ('id', 'title', 'acceptance', 'difficulty')
+DIFFICULTY_LEVELS = ('easy', 'medium', 'hard')
 DEFAULT_FILENAME = 'leetcode_problems.csv'
 
 CATEGORY = 'algorithms'
 SKIP_PROBLEMS = 0
 LIMIT_PROBLEMS = 2500
-FILTERS = dict()
+FILTERS = {}
 
 GRAPHQL_QUERY = {
     'variables': {
@@ -56,14 +57,14 @@ logger.addHandler(handler)
 
 
 def get_api_answer() -> dict:
-    """Sends a POST request to the endpoint.
+    """Sends a POST request with "GRAPHQL_QUERY" to the endpoint.
 
     Returns:
         The return dict of data.
 
     Raises:
-        EndpointError: If endpoint not available.
-
+        EndpointError: An error occurred if endpoint not available.
+        RequestError: Raises when there are other errors in the request.
     """
     try:
         response = requests.post(ENDPOINT, json=GRAPHQL_QUERY)
@@ -119,16 +120,35 @@ def parse_problem(problem: dict) -> tuple[str, str, float, str]:
     Raises:
         KeyError: An error occurred get value of key "frontendQuestionId",
         "title", "acRate" or "difficulty".
+        TypeError: Raises when values have the other type than expected.
+        ValueError: Raises when the value is different than expected.
 
     """
     try:
         problem_id = problem['frontendQuestionId']
         title = problem['title']
-        acceptance = round(problem['acRate'], 1)
-        difficulty = problem['difficulty'].lower()
+        acceptance = problem['acRate']
+        difficulty = problem['difficulty']
     except KeyError as error:
-        message = f'The problem is missing a key: {error}.'
-        raise KeyError(message)
+        raise KeyError(f'The problem is missing a key: {error}.')
+    if not isinstance(problem_id, str):
+        raise TypeError(
+            'The value of "frontendQuestionId" is not string or digit.'
+        )
+    if not problem_id.isdigit():
+        raise ValueError('The value of "frontendQuestionId" is not digit.')
+    if not isinstance(title, str):
+        raise TypeError('The value of "title" is not string')
+    if not isinstance(acceptance, (float, int)):
+        raise TypeError('The value "acRate" is not float or integer.')
+    acceptance = round(problem['acRate'], 1)
+    if not isinstance(difficulty, str):
+        raise TypeError('The value of "difficulty" is not string.')
+    difficulty = difficulty.lower()
+    if difficulty not in DIFFICULTY_LEVELS:
+        raise ValueError(
+            f'The value of "difficulty" is not in {DIFFICULTY_LEVELS}'
+        )
     return problem_id, title, acceptance, difficulty
 
 
@@ -147,7 +167,7 @@ def main():
             logger.info('The data was successfully written.')
         logger.info('The script has completed.')
     except Exception as error:
-        message = f'Program crash: {error}.\nThe program has stopped.'
+        message = f'Program crash: {error}\nThe program has stopped.'
         logger.error(message)
         sys.exit()
 
