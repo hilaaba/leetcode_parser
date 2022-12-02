@@ -12,6 +12,8 @@ The script parses all algorithmic problems from [Leetcode.com](https://leetcode.
 
 ```console
 git clone https://github.com/hilaaba/leetcode_parser
+```
+```console
 cd leetcode_parser
 ```
 
@@ -19,6 +21,8 @@ cd leetcode_parser
 
 ```console
 python3 -m venv venv
+```
+```console
 source venv/bin/activate
 ```
 
@@ -26,6 +30,8 @@ source venv/bin/activate
 
 ```console
 python3 -m pip install --upgrade pip
+```
+```console
 python3 -m pip install -r requirements.txt
 ```
 
