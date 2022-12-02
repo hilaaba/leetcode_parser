@@ -65,6 +65,7 @@ def get_api_answer() -> dict:
     Raises:
         EndpointError: An error occurred if endpoint not available.
         RequestError: Raises when there are other errors in the request.
+
     """
     try:
         response = requests.post(ENDPOINT, json=GRAPHQL_QUERY)
