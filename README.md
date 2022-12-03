@@ -6,6 +6,8 @@ Task description is [here](bestplace_leetcode.pdf).
 
 The script parses all algorithmic problems from [Leetcode.com](https://leetcode.com/problemset/algorithms/) website and writes them in a .csv file.
 
+An example of how the script works on the first 10 tasks can be viewed [here](leetcode_problems.csv).
+
 ## Installation
 
 1) Clone repo:

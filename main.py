@@ -110,13 +110,15 @@ def get_problems(response: dict) -> list[dict]:
 
 
 def parse_problem(problem: dict) -> tuple[str, str, float, str]:
-    """Parse id, title, acceptance and difficulty of leetcode problem.
+    """Parse and validate id, title, acceptance and difficulty
+    of leetcode problem.
 
     Args:
         problem: A dict where key-value is data of leetcode problem.
 
     Returns:
-        The return a tuple of values id, title, acceptance and difficulty.
+        The return a validated tuple of values id, title, acceptance
+        and difficulty.
 
     Raises:
         KeyError: An error occurred get value of key "frontendQuestionId",
