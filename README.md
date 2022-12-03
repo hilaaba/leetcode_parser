@@ -8,6 +8,12 @@ The script parses all algorithmic problems from [Leetcode.com](https://leetcode.
 
 An example of how the script works on the first 10 tasks can be viewed [here](leetcode_problems.csv).
 
+## Technologies:
+```
+Python 3.10
+Requests 2.28.1 
+```
+
 ## Installation
 
 1) Clone repo:
